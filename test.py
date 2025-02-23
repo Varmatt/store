@@ -11,13 +11,25 @@ with open('aboba.json', 'r') as file:
     data = json.load(file)
 
 
+
+
 @app.route('/products', methods=['GET'])
 def get_products():
     kv = {}
     for key, value in request.args.items():
         kv[key] = value
 
-    filters = data["products"]
+    filters = list(reversed(sorted(data['products'], key=lambda x: x['rating'])))
+    if key_in_dictionary(kv, "sort_by"):
+        if kv["sort_by"] == "price_down":
+            filters = sorted(filters, key=lambda x: x['price'])
+        elif kv["sort_by"] == "price_up":
+            filters = list(reversed(sorted(filters, key=lambda x: x['price'])))
+        elif kv["sort_by"] == "rating_down":
+            filters = sorted(filters, key=lambda x: x['rating'])
+        elif kv["sort_by"] == "alphabet":
+            filters = sorted(filters, key=lambda x: x['title'])
+
     if key_in_dictionary(kv, "sku"):
         filters = list(filter(lambda p: p["sku"] == kv["sku"], filters))
 
@@ -27,13 +39,10 @@ def get_products():
     if key_in_dictionary(kv, "tags"):
         filters = list(filter(lambda p: all([1 if i in str(p["tags"]) else 0 for i in kv["tags"].split(',')]), data["products"]))
 
-    if key_in_dictionary(kv, "price_from") and key_in_dictionary(kv, "price_to"):
-        filters = list(filter(lambda p: int(kv["price_from"]) <= int(p["price"]) <= int(kv["price_from"]), filters))
-
-    if key_in_dictionary(kv, "price_from") and (not key_in_dictionary(kv, "price_to")):
+    if key_in_dictionary(kv, "price_from"):
         filters = list(filter(lambda p: int(kv["price_from"]) <= int(p["price"]), filters))
 
-    if key_in_dictionary(kv, "price_to") and (not key_in_dictionary(kv, "price_from")):
+    if key_in_dictionary(kv, "price_to"):
         filters = list(filter(lambda p: int(p["price"]) <= int(kv["price_to"]), filters))
 
     if key_in_dictionary(kv, "brand"):
