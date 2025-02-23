@@ -13,10 +13,8 @@ with open('aboba.json', 'r') as file:
 
 @app.route('/products', methods=['GET'])
 def get_products():
-    params = request.args
-
     kv = {}
-    for key, value in params.items():
+    for key, value in request.args.items():
         kv[key] = value
 
     filters = data["products"]
