@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def avecaesar():
-    return 'Ave Caesar'
+    return 'Ave Caesar!'
 
 with open('aboba.json', 'r') as file:
     data = json.load(file)
@@ -71,4 +71,4 @@ def create_json():
 
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=False, host="192.168.1.68")
